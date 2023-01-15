@@ -15,7 +15,7 @@ def get_transaction():
 def get_chain():
     """チェーンをブラウザに表示させる
     """
-    pass
+    return blockchain.block
 
 @app.post("/transaction_pool")
 def post_transaction():
