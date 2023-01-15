@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+/blockchain-venv
+/DetaCLI
+/fastapi_test
+/venv.bat
+/venv.ps1
