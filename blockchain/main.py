@@ -1,13 +1,15 @@
 from fastapi import FastAPI
+from blockchain import BlockChain
 
 app = FastAPI()
+blockchain = BlockChain()
 
 @app.get("/transaction_pool")
 def get_transaction():
     """
     トランザクションプールをブラウザ上に表示させる
     """
-    pass
+    return blockchain.transaction_pool
 
 @app.get("/chain")
 def get_chain():
