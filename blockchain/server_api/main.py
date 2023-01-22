@@ -20,7 +20,7 @@ def get_transaction():
 def get_chain():
     """チェーンをブラウザに表示させる
     """
-    return blockchain.block
+    return blockchain.chain
 
 @app.post("/transaction_pool")
 def post_transaction_pool(transaction :Transaction):
@@ -30,9 +30,10 @@ def post_transaction_pool(transaction :Transaction):
     blockchain.add_transaction_pool(transaction)
     return { "message" : "Transaction is posted."}
 
-@app.post("/create_chain")
-def create_chain():
+@app.get("/create_block/{creator}")
+def create_block(creator: str):
     """
     ブロックの生成処理を行う
     """
-    pass
+    blockchain.create_new_block(creator)
+    return {"message": "New Block is Created."}
