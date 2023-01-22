@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 /blockchain-venv
+blockchain/server_api/.deta
 /fastapi_test
 /venv.bat
 /venv.ps1
