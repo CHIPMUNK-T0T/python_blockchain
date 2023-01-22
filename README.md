@@ -1,5 +1,6 @@
 # python_blockchain
 [pythonによるブロックチェーン開発教本](https://www.amazon.co.jp/gp/product/B0B55XSBNZ)の写経
+参考元：https://github.com/moyattodataman/blockchain
 
 # Requirement
 
