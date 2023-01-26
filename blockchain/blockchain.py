@@ -50,6 +50,15 @@ class BlockChain(object):
     
     def broadcast_transaction(self, transaction):
         transaction_dict = transaction.dict()
-        for url in self.add_server_list:
+        for url in self.server_list:
             res = requests.post(url+"/receive_transaction", json.dumps(transaction_dict))
             print(res.json())
+    
+    def broadcast_chain(self, chain):
+        for url in self.server_list:
+            res = requests.post(url+"/receive_chain", json.dumps(chain))
+            print(res.json())
+
+    def replace_chain(self, chain):
+        self.chain = chain.dict()
+        self.transaction_pool["transactions"] = []
