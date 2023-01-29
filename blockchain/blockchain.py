@@ -20,8 +20,16 @@ class BlockChain(object):
     def __init__(self):
         self.transaction_pool = {"transactions": []}
         self.chain = {"blocks": []}
+        self.genesis_block = {
+            "time": "0000-00-00T00:00:00.000000",
+            "transactions": [],
+            "hash": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "nonce": 0
+        }
         self.server_list = []
         self.REWORD_AMOUNT = 12.5
+
+        self.chain["blocks"].append(self.genesis_block)
     
     def add_server_list(self, server_list):
         self.server_list = server_list
@@ -43,10 +51,13 @@ class BlockChain(object):
         transactions = self.transaction_pool["transactions"].copy()
         transactions.append(reword_transaction_dict)
 
+        last_block_dict = self.chain["blocks"][-1]
+        hash = self.hash(last_block_dict)
+
         block = {
             "time": datetime.datetime.now().isoformat(),
             "transactions": transactions,
-            "hash": "hash_sample",
+            "hash": hash,
             "nonce": 0
         }
 
@@ -83,3 +94,9 @@ class BlockChain(object):
         transaction_unsigned_json = json.dumps(transaction_unsigned)
         transaction_unsigned_bytes = bytes(transaction_unsigned_json, encoding = "utf-8")
         return public_key.verify(signature, transaction_unsigned_bytes)
+
+    def hash(self, block_dict):
+        block_json = json.dumps(block_dict)
+        block_byte = bytes(block_json, encoding="utf-8")
+        hash = hashlib.sha256(block_byte).hexdigest()
+        return hash
