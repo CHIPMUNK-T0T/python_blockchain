@@ -35,9 +35,10 @@ def post_transaction_pool(transaction :Transaction):
     """
     トランザクションをトランザクションプールに追加する
     """
-    blockchain.add_transaction_pool(transaction)
-    blockchain.broadcast_transaction(transaction)
-    return { "message" : "Transaction is posted."}
+    if blockchain.verify_transaction(transaction):
+        blockchain.add_transaction_pool(transaction)
+        blockchain.broadcast_transaction(transaction)
+        return { "message" : "Transaction is posted."}
 
 @app.get("/create_block/{creator}")
 def create_block(creator: str):
@@ -50,8 +51,9 @@ def create_block(creator: str):
 
 @app.post("/receive_transaction")
 def receive_transaction(transaction :Transaction):
-    blockchain.add_transaction_pool(transaction)
-    return { "message" : "Broadcast Transaction is success."}
+    if blockchain.verify_transaction(transaction):
+        blockchain.add_transaction_pool(transaction)
+        return { "message" : "Broadcast Transaction is success."}
 
 @app.post("/receive_chain")
 def receive_chain(chain: Chain):

@@ -8,6 +8,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from transaction import Transaction
 import datetime
 
+from ecdsa import VerifyingKey
+from ecdsa import SECP256k1
+import binascii
+import hashlib
+
 class BlockChain(object):
     """
     ブロックチェーンの構造や機能を含んだクラス
@@ -62,3 +67,19 @@ class BlockChain(object):
     def replace_chain(self, chain):
         self.chain = chain.dict()
         self.transaction_pool["transactions"] = []
+    
+    def verify_transaction(self, transaction):
+        public_key = VerifyingKey.from_string(binascii.unhexlify(transaction.sender), curve=SECP256k1)
+        signature = binascii.unhexlify(transaction.signature)
+
+        transaction_unsigned = {
+            "time": transaction.time,
+            "sender": transaction.sender,
+            "receiver": transaction.receiver,
+            "amount": transaction.amount,
+            "description": transaction.description
+        }
+
+        transaction_unsigned_json = json.dumps(transaction_unsigned)
+        transaction_unsigned_bytes = bytes(transaction_unsigned_json, encoding = "utf-8")
+        return public_key.verify(signature, transaction_unsigned_bytes)
