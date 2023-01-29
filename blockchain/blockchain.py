@@ -28,6 +28,7 @@ class BlockChain(object):
         }
         self.server_list = []
         self.REWORD_AMOUNT = 12.5
+        self.PROOF_OF_WORK_DIFFICULTY = 4
 
         self.chain["blocks"].append(self.genesis_block)
     
@@ -54,15 +55,26 @@ class BlockChain(object):
         last_block_dict = self.chain["blocks"][-1]
         hash = self.hash(last_block_dict)
 
-        block = {
-            "time": datetime.datetime.now().isoformat(),
+        block_without_time = {
             "transactions": transactions,
             "hash": hash,
             "nonce": 0
+            }
+        
+        while not self.hash(block_without_time)[:self.PROOF_OF_WORK_DIFFICULTY] == '0'*self.PROOF_OF_WORK_DIFFICULTY:
+            block_without_time["nonce"] += 1
+
+        block = {
+            "time": datetime.datetime.now().isoformat(),
+            "transactions": block_without_time["transactions"],
+            "hash": block_without_time["hash"],
+            "nonce": block_without_time["nonce"]
         }
 
         self.chain["blocks"].append(block)
-        self.transaction_pool["transactions"] = []
+        for transaction in block["transactions"]:
+            if transaction in self.transaction_pool["transactions"]:
+                self.transaction_pool["transactions"].remove(transaction)
     
     def broadcast_transaction(self, transaction):
         transaction_dict = transaction.dict()
@@ -76,8 +88,12 @@ class BlockChain(object):
             print(res.json())
 
     def replace_chain(self, chain):
-        self.chain = chain.dict()
-        self.transaction_pool["transactions"] = []
+        chain_dict = chain.dict()
+        self.chain = chain_dict
+        latest_block_transactions = chain_dict["blocks"][-1]["transactions"]
+        for transaction in latest_block_transactions:
+            if transaction in self.transaction_pool["transactions"]:
+                self.transaction_pool["transactions"].remove(transaction)
     
     def verify_transaction(self, transaction):
         public_key = VerifyingKey.from_string(binascii.unhexlify(transaction.sender), curve=SECP256k1)
