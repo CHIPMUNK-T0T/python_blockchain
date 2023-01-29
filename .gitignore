@@ -130,6 +130,7 @@ dmypy.json
 
 /blockchain-venv
 blockchain/server_api/.deta
+/participants
 /fastapi_test
 /venv.bat
 /venv.ps1
