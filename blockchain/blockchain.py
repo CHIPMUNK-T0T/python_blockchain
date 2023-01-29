@@ -27,7 +27,7 @@ class BlockChain(object):
             "nonce": 0
         }
         self.server_list = []
-        self.REWORD_AMOUNT = 12.5
+        self.REWORD_AMOUNT = 12
         self.PROOF_OF_WORK_DIFFICULTY = 4
 
         self.chain["blocks"].append(self.genesis_block)
@@ -116,3 +116,34 @@ class BlockChain(object):
         block_byte = bytes(block_json, encoding="utf-8")
         hash = hashlib.sha256(block_byte).hexdigest()
         return hash
+
+    def verify_chain(self, chain):
+        chain_dict = chain.dict()
+
+        if len(chain_dict["blocks"]) <= len(self.chain["blocks"]):
+            return False
+
+        for i in range(len(chain_dict["blocks"])):
+            block = chain_dict["blocks"][i]
+            previous_block = chain_dict["blocks"][i-1]
+            if i == 0:
+                if block != self.genesis_block:
+                    return False
+            else:
+                if block["hash"] != self.hash(previous_block):
+                    return False
+                block_without_time = {
+                    "transactions": block["transactions"],
+                    "hash": block["hash"],
+                    "nonce": block["nonce"]
+                }
+                if self.hash(block_without_time)[:self.PROOF_OF_WORK_DIFFICULTY] != '0'*self.PROOF_OF_WORK_DIFFICULTY:
+                    return False
+
+        reword_transaction = chain_dict["blocks"][-1]["transactions"][-1]
+        if reword_transaction["sender"] != "Blockchain":
+            return False
+        if reword_transaction["amount"] != self.REWORD_AMOUNT:
+            return False
+
+        return True
